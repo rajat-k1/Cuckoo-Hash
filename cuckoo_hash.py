@@ -89,11 +89,3 @@ class CuckooHash:
 	# feel free to define new methods in addition to the above
 	# fill in the definitions of each required member function (above),
 	# and for any additional member functions you define
-			
-# chash = CuckooHash(10)
-# chash.insert(101)
-# print(chash.get_table_contents())
-# chash.insert(12)
-# print(chash.get_table_contents())
-# chash.insert(15)
-# print(chash.get_table_contents())
