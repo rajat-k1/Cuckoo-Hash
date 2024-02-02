@@ -92,22 +92,30 @@ class CuckooHash24:
 
 
 	def rehash(self, new_table_size: int) -> None:
-		self.__num_rehashes += 1; self.table_size = new_table_size # do not modify this line
+		self.__num_rehashes += 1; 
+		old_table_size = self.table_size
+		self.table_size = new_table_size # do not modify this line
 		# TODO
 		if new_table_size <= 0:
 			raise ValueError("New table size must be a positive integer.")
 
 		# Updating the table size	
-		old_tables = [self.tables[0].copy(), self.tables[1].copy()]
+		old_tables = self.get_table_contents()
 		self.tables = [[None] * new_table_size for _ in range(2)]
 		
 		# Copy keys from old tables to the new tables
-		for old_table in old_tables:
-			if old_table is not None:
-				for bucket in old_table:
-					if bucket is not None:
-						for key in bucket:
-							self.insert(key)
+		for i in range(old_table_size):
+			if old_tables[0][i] is not None:
+				for num in old_tables[0][i]:
+					self.insert(num)
+
+		for i in range(old_table_size):
+			if old_tables[1][i] is not None:
+				for num in old_tables[1][i]:
+					self.insert(num)
+
+
+
 
 	# feel free to define new methods in addition to the above
 	# fill in the definitions of each required member function (above),

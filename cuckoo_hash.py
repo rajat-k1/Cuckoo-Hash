@@ -68,24 +68,21 @@ class CuckooHash:
 
 	def rehash(self, new_table_size: int) -> None:
 	##################CODE STARTS FROM HERE#######################################################################################################
-		self.__num_rehashes += 1; self.table_size = new_table_size # do not modify this line
+			self.__num_rehashes += 1
+			old_table_size = self.table_size
+			old_tables = self.get_table_contents()
+			self.table_size = new_table_size
+			self.tables = [[None]*new_table_size for _ in range(2)]
 
-		old_elements = [key for table in self.tables for key in table if key is not None]
+			for i in range(old_table_size):
+				if old_tables[0][i] is not None:
+					self.insert(old_tables[0][i])
 
-		self.tables = [[None for _ in range(new_table_size)] for _ in range(2)]
-
-		failed_keys = []
-		for key in old_elements:
-			if not self.insert(key):
-				failed_keys.append(key)
-		
-		if failed_keys:
-			print(f"Rehashing failed for {len(failed_keys)} keys, attemping with a bigger size")
-			self.rehash(new_table_size * 2)
-
+			for i in range(old_table_size):
+				if old_tables[1][i] is not None:
+					self.insert(old_tables[1][i])
 	##############################################################################################################################################
-	
 
-	# feel free to define new methods in addition to the above
-	# fill in the definitions of each required member function (above),
-	# and for any additional member functions you define
+		# feel free to define new methods in addition to the above
+		# fill in the definitions of each required member function (above),
+		# and for any additional member functions you define
