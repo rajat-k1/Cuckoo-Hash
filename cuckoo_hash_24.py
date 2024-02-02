@@ -65,14 +65,11 @@ class CuckooHash24:
 
 	def lookup(self, key: int) -> bool:
 		# TODO
-		hash_value0 = self.hash_func(key, 0)
-		hash_value1 = self.hash_func(key, 1)
-
-		#Cheking if the key is already present in one of the tables
-		if self.tables[0][hash_value0] == key or self.tables[1][hash_value1] == key:
+		hash_value1 = self.hash_func(key, 0)
+		hash_value2 = self.hash_func(key, 1)
+		if (self.tables[0][hash_value1] is not None and key in self.tables[0][hash_value1]) or (self.tables[1][hash_value2] is not None and key in self.tables[1][hash_value2]):
 			return True
 		return False
-
 
 
 	def delete(self, key: int) -> None:
