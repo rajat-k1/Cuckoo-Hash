@@ -1,5 +1,5 @@
-# explanations for member functions are provided in requirements.py
-# each file that uses a cuckoo hash should import it from this file.
+	# explanations for member functions are provided in requirements.py
+	# each file that uses a cuckoo hash should import it from this file.
 import random as rand
 from typing import List, Optional
 
@@ -37,21 +37,80 @@ class CuckooHash24:
 
 	def insert(self, key: int) -> bool:
 		# TODO
-		pass
+		table_id = 0
+		for _ in range(self.CYCLE_THRESHOLD + 1):
+			# Calculating the bucket index using hash_func  
+			bucket_idx = self.hash_func(key, table_id)
+			# Retrieving the bucket at the calculated index
+			bucket = self.tables[table_id][bucket_idx]
+
+			# If the bucket is None, creating a new bucket with the key
+			if bucket is None:
+				self.tables[table_id][bucket_idx] = [key]
+				return True
+			# If the bucket has space, appending the key to it
+			elif len(bucket) < self.bucket_size:
+				bucket.append(key)
+				return True
+			# The bucket is full, so displacing a key and continue the process
+			else:
+				displaced_idx = self.get_rand_idx_from_bucket(bucket_idx, table_id)
+				temp = bucket[displaced_idx]
+				bucket[displaced_idx] = key
+				key = temp
+				table_id = 1 - table_id
+		return False
+
+
 
 	def lookup(self, key: int) -> bool:
 		# TODO
-		pass
-		
+		hash_value0 = self.hash_func(key, 0)
+		hash_value1 = self.hash_func(key, 1)
+
+		#Cheking if the key is already present in one of the tables
+		if self.tables[0][hash_value0] == key or self.tables[1][hash_value1] == key:
+			return True
+		return False
+
+
 
 	def delete(self, key: int) -> None:
 		# TODO
-		pass
+		for table_id in range(2):
+			bucket_idx = self.hash_func(key, table_id)
+			bucket = self.tables[table_id][bucket_idx]
+			
+			# Checking if the bucket exists and the key is in the bucket
+			if bucket is not None and key in bucket:
+				# Remove the key from the bucket
+				bucket.remove(key)
+
+				# Checking if the bucket is now empty, set to None if so
+				if len(bucket) == 0:
+					self.tables[table_id][bucket_idx] = None
+				return
+		return
+
+
 
 	def rehash(self, new_table_size: int) -> None:
 		self.__num_rehashes += 1; self.table_size = new_table_size # do not modify this line
 		# TODO
-		pass
+		if new_table_size <= 0:
+			raise ValueError("New table size must be a positive integer.")
+
+		# Updating the table size	
+		old_tables = [self.tables[0].copy(), self.tables[1].copy()]
+		self.tables = [[None] * new_table_size for _ in range(2)]
+		
+		# Copy keys from old tables to the new tables
+		for old_table in old_tables:
+			if old_table is not None:
+				for bucket in old_table:
+					if bucket is not None:
+						for key in bucket:
+							self.insert(key)
 
 	# feel free to define new methods in addition to the above
 	# fill in the definitions of each required member function (above),
